@@ -1,0 +1,36 @@
+version: "3"
+
+services:
+  db:
+    image: postgres
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+  backend:
+    build: "categorizer_backend/"
+    command: python categorizer_backend/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/code/
+    ports:
+      - "8000:8000"
+    environment:
+      - POSTGRES_NAME=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    depends_on:
+      - db
+  fe_st:
+    build: "streamlit_fe/"
+    command: streamlit run streamlit_fe/streamlit_fe.py --server.port 8501
+    volumes:
+      - .:/code
+    ports:
+        - "8501:8501"
+    depends_on:
+    - backend
+
+networks:
+  default:
