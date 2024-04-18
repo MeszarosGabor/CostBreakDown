@@ -6,7 +6,10 @@ import categorizer.models as models
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Category
-        fields = ['name',]
+        fields = ["id", "name"]
+        extra_kwargs = {
+            'name': {'validators': []},  # Disable the unique validator for the update case
+        }
 
 
 class TransactionSerializer(serializers.ModelSerializer):
@@ -27,9 +30,14 @@ class CategoryPatternSerializer(serializers.ModelSerializer):
 class CategorizedTransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.CategorizedTransaction
-        fields = ['transaction', 'category', 'pattern']
+        fields = ['id', 'transaction', 'category', 'category_id', 'pattern']
 
     
     transaction = TransactionSerializer()
-    category = CategorySerializer()
+    category = CategorySerializer(read_only=True)
+    category_id = serializers.PrimaryKeyRelatedField(
+        queryset=models.Category.objects.all(),
+        source="category",
+        write_only=True,
+    )
     pattern = CategoryPatternSerializer()

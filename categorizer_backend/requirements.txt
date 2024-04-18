@@ -3,3 +3,4 @@ ipython
 psycopg2>=2.8
 django-rest-framework
 django-cors-headers
+requests

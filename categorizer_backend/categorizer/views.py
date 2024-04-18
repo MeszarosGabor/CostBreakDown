@@ -1,7 +1,7 @@
 import collections
 import datetime
 
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from rest_framework import generics, viewsets, response, status
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view, action
@@ -18,9 +18,10 @@ class CategoryList(generics.ListCreateAPIView):
 class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = models.Category.objects.all()
     serializer_class = serializers.CategorySerializer
+    lookup_field = "id"
     
-    def get_object(self, queryset=None):
-        return models.Category.objects.filter(name=self.kwargs.get("name")).first()
+    #def get_object(self, queryset=None):
+    #    return models.Category.objects.filter(name=self.kwargs.get("name")).first()
 
 
 class TransactionList(generics.ListCreateAPIView):
@@ -62,11 +63,12 @@ class CategorizedTransactionList(generics.ListCreateAPIView):
 
 
 class CategorizedTransactionDetail(generics.RetrieveUpdateDestroyAPIView):
-    # queryset = models.CategorizedTransaction.objects.prefetch_related("category").prefetch_related("transaction").all()
+    queryset = models.CategorizedTransaction.objects.prefetch_related("category").prefetch_related("transaction").all()
     serializer_class = serializers.CategorizedTransactionSerializer
-    
-    def get_object(self, queryset=None):
-        return models.CategorizedTransaction.objects.prefetch_related("category").prefetch_related("transaction").filter(transaction__identifier=self.kwargs.get("identifier")).first()
+    lookup_field = "id"
+
+    #def get_object(self, queryset=None):
+    #    return models.CategorizedTransaction.objects.prefetch_related("category").prefetch_related("transaction").filter(transaction__identifier=self.kwargs.get("id")).first()
 
 
 class CategorizedTransactionListWindow(generics.ListCreateAPIView):
